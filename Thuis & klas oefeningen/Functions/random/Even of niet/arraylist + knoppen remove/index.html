@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Simpele Verwijderfunctie</title>
+</head>
+<body>
+<div id="app">
+    <input type="number" id="numberInput" placeholder="Voer een getal in">
+    <button id="addButton">Toevoegen</button>
+    <button id="clearListButton">Verwijder Hele Lijst</button>
+    <ul id="numberList"></ul>
+</div>
+
+<script>
+    const numberList = []; // Array om items op te slaan
+    const numberListElement = document.getElementById("numberList");
+
+    // Voeg een item toe
+    document.getElementById("addButton").addEventListener("click", () => {
+        const inputField = document.getElementById("numberInput");
+        const value = inputField.value;
+
+        if (value) {
+            numberList.push(value); // Voeg het getal toe aan de array
+            updateList(); // Update de lijst
+            inputField.value = ""; // Leeg het invoerveld
+        }
+    });
+
+    // Verwijder de hele lijst
+    document.getElementById("clearListButton").addEventListener("click", () => {
+        numberList.length = 0; // Maak de array leeg
+        updateList(); // Update de lijst
+    });
+
+    // Update de lijst
+    function updateList() {
+        numberListElement.innerHTML = ""; // Maak de lijst eerst leeg
+        numberList.forEach((item, index) => {
+            const listItem = document.createElement("li"); // Maak een lijstitem
+            listItem.textContent = item; // Voeg de waarde toe
+
+            // Verwijderknop toevoegen
+            const removeButton = document.createElement("button");
+            removeButton.textContent = "Verwijder";
+            removeButton.style.marginLeft = "10px";
+            removeButton.addEventListener("click", () => {
+                numberList.splice(index, 1); // Verwijder dit item
+                updateList(); // Update de lijst
+            });
+
+            listItem.appendChild(removeButton); // Voeg knop toe aan lijstitem
+            numberListElement.appendChild(listItem); // Voeg lijstitem toe aan lijst
+        });
+    }
+</script>
+</body>
+</html>

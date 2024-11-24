@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muziekinstrumenten</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container my-5">
+    <h1 class="text-center">Muziekinstrumenten Beheer</h1>
+    <!-- Formulier voor het toevoegen van een instrument -->
+    <form id="addInstrumentForm" class="mb-4">
+        <h3>Nieuw Instrument Toevoegen</h3>
+        <div class="mb-3">
+            <label for="instrumentName" class="form-label">Naam van het instrument</label>
+            <input type="text" class="form-control" id="instrumentName" required>
+        </div>
+        <div class="mb-3">
+            <label for="instrumentType" class="form-label">Type instrument</label>
+            <input type="text" class="form-control" id="instrumentType" required>
+        </div>
+        <div class="mb-3">
+            <label for="instrumentPrice" class="form-label">Prijs</label>
+            <input type="number" step="0.01" class="form-control" id="instrumentPrice" required>
+        </div>
+        <div class="mb-3">
+            <label for="electricUsage" class="form-label">Elektrisch Verbruik (optioneel)</label>
+            <input type="number" step="1" class="form-control" id="electricUsage">
+        </div>
+        <button type="submit" class="btn btn-primary">Instrument Toevoegen</button>
+    </form>
+
+    <!-- Knoppen voor acties -->
+    <div class="mb-4">
+        <button id="listInstruments" class="btn btn-info">Toon Alle Instrumenten</button>
+        <button id="calculateTotal" class="btn btn-success">Bereken Totale Waarde</button>
+        <button id="sortByPrice" class="btn btn-secondary">Sorteer op Prijs</button>
+    </div>
+
+    <!-- Output -->
+    <div id="output" class="mt-4">
+        <h3>Resultaten:</h3>
+        <ul id="instrumentList" class="list-group"></ul>
+        <p id="totalValue" class="mt-3"></p>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    class Muziekinstrumenten {
+        constructor(instrument, type, prijs) {
+            this.muziekinstrument = instrument;
+            this.instrumentype = type;
+            this.instrumentprijs = prijs;
+        }
+
+        getInfo() {
+            return `De ${this.muziekinstrument} is een ${this.instrumentype} en kost €${this.instrumentprijs.toFixed(2)}.`;
+        }
+    }
+
+    class ElectricInstrument extends Muziekinstrumenten {
+        constructor(instrument, type, prijs, verbruik) {
+            super(instrument, type, prijs);
+            this.electricverbruik = verbruik;
+        }
+
+        getInfo() {
+            return `De ${this.muziekinstrument} is een ${this.instrumentype} en kost €${this.instrumentprijs.toFixed(2)}, hij verbruikt ${this.electricverbruik} Watt.`;
+        }
+    }
+
+    class Inventory {
+        constructor() {
+            this.items = [];
+        }
+
+        addInstrument(item) {
+            this.items.push(item);
+        }
+
+        listInstruments() {
+            const instrumentList = document.getElementById('instrumentList');
+            instrumentList.innerHTML = ''; // Reset de lijst
+            if (this.items.length === 0) {
+                const emptyMsg = document.createElement('li');
+                emptyMsg.className = 'list-group-item text-muted';
+                emptyMsg.textContent = 'Geen instrumenten in de inventaris.';
+                instrumentList.appendChild(emptyMsg);
+            } else {
+                this.items.forEach((item) => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.textContent = item.getInfo();
+                    instrumentList.appendChild(li);
+                });
+            }
+        }
+
+        getTotalValue() {
+            return this.items.reduce((total, item) => total + item.instrumentprijs, 0);
+        }
+
+        sortByPrice() {
+            this.items.sort((a, b) => a.instrumentprijs - b.instrumentprijs);
+        }
+    }
+
+    const inventory = new Inventory();
+
+    document.getElementById('addInstrumentForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const name = document.getElementById('instrumentName').value;
+        const type = document.getElementById('instrumentType').value;
+        const price = parseFloat(document.getElementById('instrumentPrice').value);
+        const usage = parseFloat(document.getElementById('electricUsage').value);
+
+        if (usage) {
+            inventory.addInstrument(new ElectricInstrument(name, type, price, usage));
+        } else {
+            inventory.addInstrument(new Muziekinstrumenten(name, type, price));
+        }
+
+        document.getElementById('addInstrumentForm').reset();
+    });
+
+    document.getElementById('listInstruments').addEventListener('click', function () {
+        inventory.listInstruments();
+    });
+
+    document.getElementById('calculateTotal').addEventListener('click', function () {
+        const totalValue = inventory.getTotalValue();
+        document.getElementById('totalValue').textContent = `Totale waarde van de inventaris: €${totalValue.toFixed(2)}`;
+    });
+
+    document.getElementById('sortByPrice').addEventListener('click', function () {
+        inventory.sortByPrice();
+        inventory.listInstruments();
+    });
+</script>
+</body>
+</html>
